@@ -617,6 +617,18 @@
             transform: scale(1.05);
             z-index: 10;
         }
+        .puzzle-piece.selected {
+            border: 3px solid gold;
+            transform: scale(1.02);
+            z-index: 10;
+        }
+        /* Для очень узких экранов делаем пазл ещё меньше, чтобы кусочки были крупнее */
+        @media (max-width: 360px) {
+            .puzzle-area {
+                width: 240px;
+                height: 240px;
+            }
+        }
 
         /* СТРАНИЦА 6: ГАЛЕРЕЯ */
         .gallery-container {
@@ -790,6 +802,29 @@
             transform: none;
         }
 
+        /* Для финальной страницы разрешаем прокрутку
+        #page8 .page-content {
+            overflow-y: auto;
+            justify-content: flex-start;
+            padding-top: 20px;
+            padding-bottom: 100px;
+        }*/
+
+        /* Уменьшаем отступы на очень маленьких экранах */
+        @media (max-width: 480px) and (max-height: 700px) {
+            #page8 .final-message {
+                padding-bottom: 30px;
+            }
+            #page8 .final-heart {
+                font-size: 60px;
+            }
+            #page8 .download-btn {
+                margin-top: 20px;
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+        }
+
         /* КОНФЕТТИ */
         .confetti {
             position: fixed;
@@ -860,6 +895,16 @@
                 padding: 80px 15px 110px;
             }
         }
+
+        /* Прокрутка для финальной страницы только на маленьких экранах (по высоте) */
+@media (max-height: 700px) {
+    #page8 .page-content {
+        overflow-y: auto;
+        justify-content: flex-start;
+        padding-top: 20px;
+        padding-bottom: 100px;
+    }
+}
 
 
     </style>
@@ -1708,8 +1753,8 @@ function initShakePage() {
             image.style.filter = 'blur(0)';
             button.disabled = true;
             button.textContent = 'Готово!';
-            //pageCompleted[3] = true;
-            pageCompleted[4] = true;
+            pageCompleted[3] = true;
+            //pageCompleted[4] = true;
             LogSystem?.success('ShakePage завершена');
             createConfetti(); // добавим конфетти для радости
         }
@@ -1782,133 +1827,364 @@ function initShakePage() {
 
 
         // СТРАНИЦА 5: ПАЗЛ - ИСПРАВЛЕН (твой код)
+        // СТРАНИЦА 5: ПАЗЛ – исправленная версия для мобильных
+// СТРАНИЦА 5: ПАЗЛ – универсальная версия (десктоп drag-and-drop, мобильная click)
+// СТРАНИЦА 5: ПАЗЛ – универсальная версия (десктоп drag-and-drop, мобильная click)
+        // СТРАНИЦА 5: ПАЗЛ – универсальная версия (десктоп drag-and-drop, мобильная click)
         function initPuzzlePage() {
-            const puzzle = document.getElementById('puzzle');
-            puzzle.innerHTML = '';
+    // ЕСЛИ ПАЗЛ УЖЕ СОБРАН – ПОКАЗЫВАЕМ ЗАВЕРШЁННОЕ СОСТОЯНИЕ И ВЫХОДИМ
+    if (pageCompleted[4]) {
+        displaySolvedPuzzle();
+        return;
+    }
 
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.src = 'https://images.unsplash.com/photo-1515871204537-49a5fe66a31f?q=80&w=1082&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+    const isMobile = window.innerWidth <= 768; // мобильные устройства
+    if (isMobile) {
+        initPuzzleMobile();
+    } else {
+        initPuzzleDesktop();
+    }
 
-            img.onload = () => {
-                LogSystem.info('Изображение пазла загружено');
+    // ---------- Функция отображения собранного пазла (без перемешивания) ----------
+    function displaySolvedPuzzle() {
+        const puzzle = document.getElementById('puzzle');
+        puzzle.innerHTML = ''; // очищаем
 
-                const canvas = document.createElement('canvas');
-                canvas.width = 300;
-                canvas.height = 300;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, 300, 300);
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = 'https://images.unsplash.com/photo-1515871204537-49a5fe66a31f?q=80&w=1082&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
-                let pieces = [];
-                const size = 3;
-                const pieceW = 100;
-                const pieceH = 100;
+        img.onload = () => {
+            // Создаём холст 300x300 с изображением, сохраняя пропорции (cover)
+            const canvas = document.createElement('canvas');
+            canvas.width = 300;
+            canvas.height = 300;
+            const ctx = canvas.getContext('2d');
 
-                // Создаем кусочки пазла
-                for (let r = 0; r < size; r++) {
-                    for (let c = 0; c < size; c++) {
-                        const px = c * pieceW;
-                        const py = r * pieceH;
-                        const data = ctx.getImageData(px, py, pieceW, pieceH);
+            const imgW = img.naturalWidth;
+            const imgH = img.naturalHeight;
+            const scale = Math.max(300 / imgW, 300 / imgH);
+            const drawW = imgW * scale;
+            const drawH = imgH * scale;
+            const offsetX = (300 - drawW) / 2;
+            const offsetY = (300 - drawH) / 2;
+            ctx.drawImage(img, 0, 0, imgW, imgH, offsetX, offsetY, drawW, drawH);
 
-                        const pCanvas = document.createElement('canvas');
-                        pCanvas.width = pieceW;
-                        pCanvas.height = pieceH;
-                        pCanvas.getContext('2d').putImageData(data, 0, 0);
+            // Разрезаем холст на 9 кусочков 100x100
+            const size = 3;
+            const pieceW = 100;
+            const pieceH = 100;
+            const pieces = [];
 
-                        const url = pCanvas.toDataURL();
-                        pieces.push({
-                            id: r * size + c,
-                            url
-                        });
-                    }
-                }
+            for (let r = 0; r < size; r++) {
+                for (let c = 0; c < size; c++) {
+                    const px = c * pieceW;
+                    const py = r * pieceH;
+                    const data = ctx.getImageData(px, py, pieceW, pieceH);
 
-                // Перемешиваем кусочки
-                pieces = pieces.sort(() => Math.random() - 0.5);
+                    const pCanvas = document.createElement('canvas');
+                    pCanvas.width = pieceW;
+                    pCanvas.height = pieceH;
+                    pCanvas.getContext('2d').putImageData(data, 0, 0);
 
-                // Создаем элементы для кусочков
-                pieces.forEach((p, idx) => {
-                    const el = document.createElement('div');
-                    el.className = 'puzzle-piece';
-                    el.draggable = true;
-                    el.style.backgroundImage = `url(${p.url})`;
-                    el.dataset.id = p.id;
-                    el.dataset.pos = idx;
-
-                    el.addEventListener('dragstart', (e) => {
-                        e.dataTransfer.setData('text/plain', e.target.dataset.id);
+                    const url = pCanvas.toDataURL();
+                    pieces.push({
+                        id: r * size + c,
+                        url
                     });
-
-                    el.addEventListener('dragover', (e) => {
-                        e.preventDefault();
-                    });
-
-                    el.addEventListener('drop', (e) => {
-                        e.preventDefault();
-                        const sourceId = e.dataTransfer.getData('text/plain');
-                        const targetId = e.target.dataset.id;
-
-                        const sourceEl = Array.from(puzzle.children).find(x => x.dataset.id === sourceId);
-                        const targetEl = e.target;
-
-                        // Меняем местами backgroundImage
-                        const tmpBg = sourceEl.style.backgroundImage;
-                        sourceEl.style.backgroundImage = targetEl.style.backgroundImage;
-                        targetEl.style.backgroundImage = tmpBg;
-
-                        // Меняем местами dataset.id
-                        const tmpD = sourceEl.dataset.id;
-                        sourceEl.dataset.id = targetEl.dataset.id;
-                        targetEl.dataset.id = tmpD;
-
-                        checkPuzzleSolved();
-                    });
-
-                    puzzle.appendChild(el);
-                });
-            };
-
-            img.onerror = () => {
-                LogSystem.error('Ошибка загрузки изображения пазла');
-                // Запасной вариант
-                for (let i = 0; i < 9; i++) {
-                    const el = document.createElement('div');
-                    el.className = 'puzzle-piece';  //отличие
-                    el.style.backgroundImage = 'linear-gradient(135deg, var(--accent), var(--accent2))';
-                    el.draggable = true; //отличие
-
-                    el.addEventListener('dragstart', (e) => {  //отличие
-                        e.dataTransfer.setData('text/plain', i);
-                    });
-
-                    puzzle.appendChild(el);
-                }
-            };
-
-            function checkPuzzleSolved() {
-                const pieces = Array.from(puzzle.children);
-                let ok = true;
-
-                pieces.forEach((el, idx) => {
-                    if (!el.dataset.id || Number(el.dataset.id) !== idx) {
-                        ok = false;
-                    }
-                });
-
-                if (ok && !pageCompleted[4]) {
-                    pageCompleted[4] = true;
-                    createConfetti();
-                    playSound('success');
-                    LogSystem.success('Пазл собран!');
-                    setTimeout(() => {
-                        alert('Сердечко собрано ❤️\nТы чудо!');
-                    }, 200);
                 }
             }
 
-            LogSystem.info('Страница 5: Пазл инициализирован');
+            // СОРТИРУЕМ ПО ID (чтобы получить правильный порядок)
+            pieces.sort((a, b) => a.id - b.id);
+
+            // Создаём элементы, но без обработчиков и без draggable
+            pieces.forEach((p) => {
+                const el = document.createElement('div');
+                el.className = 'puzzle-piece';
+                el.style.backgroundImage = `url(${p.url})`;
+                el.dataset.id = p.id;
+                // Можно добавить класс для неактивного состояния
+                el.classList.add('solved-piece');
+                // Убираем возможность перетаскивания и кликов
+                el.draggable = false;
+                el.style.pointerEvents = 'none';
+                puzzle.appendChild(el);
+            });
+        };
+
+        img.onerror = () => {
+            LogSystem.error('Ошибка загрузки изображения пазла (собранное состояние)');
+            for (let i = 0; i < 9; i++) {
+                const el = document.createElement('div');
+                el.className = 'puzzle-piece';
+                el.style.background = 'linear-gradient(135deg, #ff99cc, #ff66a3)';
+                el.dataset.id = i;
+                el.draggable = false;
+                el.style.pointerEvents = 'none';
+                puzzle.appendChild(el);
+            }
+        };
+    }
+
+    // ---------- Десктопная версия (drag-and-drop) ----------
+    function initPuzzleDesktop() {
+        const puzzle = document.getElementById('puzzle');
+        puzzle.innerHTML = '';
+
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = 'https://images.unsplash.com/photo-1515871204537-49a5fe66a31f?q=80&w=1082&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+
+        img.onload = () => {
+            LogSystem.info('Изображение пазла загружено (десктоп)');
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 300;
+            canvas.height = 300;
+            const ctx = canvas.getContext('2d');
+
+            const imgW = img.naturalWidth;
+            const imgH = img.naturalHeight;
+            const scale = Math.max(300 / imgW, 300 / imgH);
+            const drawW = imgW * scale;
+            const drawH = imgH * scale;
+            const offsetX = (300 - drawW) / 2;
+            const offsetY = (300 - drawH) / 2;
+            ctx.drawImage(img, 0, 0, imgW, imgH, offsetX, offsetY, drawW, drawH);
+
+            let pieces = [];
+            const size = 3;
+            const pieceW = 100;
+            const pieceH = 100;
+
+            for (let r = 0; r < size; r++) {
+                for (let c = 0; c < size; c++) {
+                    const px = c * pieceW;
+                    const py = r * pieceH;
+                    const data = ctx.getImageData(px, py, pieceW, pieceH);
+
+                    const pCanvas = document.createElement('canvas');
+                    pCanvas.width = pieceW;
+                    pCanvas.height = pieceH;
+                    pCanvas.getContext('2d').putImageData(data, 0, 0);
+
+                    const url = pCanvas.toDataURL();
+                    pieces.push({
+                        id: r * size + c,
+                        url
+                    });
+                }
+            }
+
+            pieces = pieces.sort(() => Math.random() - 0.5);
+
+            pieces.forEach((p, idx) => {
+                const el = document.createElement('div');
+                el.className = 'puzzle-piece';
+                el.draggable = true;
+                el.style.backgroundImage = `url(${p.url})`;
+                el.dataset.id = p.id;
+                el.dataset.pos = idx;
+
+                el.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', e.target.dataset.id);
+                });
+
+                el.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                });
+
+                el.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const sourceId = e.dataTransfer.getData('text/plain');
+                    const targetId = e.target.dataset.id;
+
+                    const sourceEl = Array.from(puzzle.children).find(x => x.dataset.id === sourceId);
+                    const targetEl = e.target;
+
+                    const tmpBg = sourceEl.style.backgroundImage;
+                    const tmpId = sourceEl.dataset.id;
+
+                    sourceEl.style.backgroundImage = targetEl.style.backgroundImage;
+                    sourceEl.dataset.id = targetEl.dataset.id;
+
+                    targetEl.style.backgroundImage = tmpBg;
+                    targetEl.dataset.id = tmpId;
+
+                    checkPuzzleSolved();
+                });
+
+                puzzle.appendChild(el);
+            });
+        };
+
+        img.onerror = () => {
+            LogSystem.error('Ошибка загрузки изображения пазла (десктоп)');
+            for (let i = 0; i < 9; i++) {
+                const el = document.createElement('div');
+                el.className = 'puzzle-piece';
+                el.style.background = 'linear-gradient(135deg, #ff99cc, #ff66a3)';
+                el.draggable = true;
+                puzzle.appendChild(el);
+            }
+        };
+
+        function checkPuzzleSolved() {
+            const pieces = Array.from(puzzle.children);
+            let ok = true;
+            pieces.forEach((el, idx) => {
+                if (!el.dataset.id || Number(el.dataset.id) !== idx) {
+                    ok = false;
+                }
+            });
+
+            if (ok && !pageCompleted[4]) {
+                pageCompleted[4] = true;
+                createConfetti();
+                playSound('success');
+                LogSystem.success('Пазл собран!');
+                setTimeout(() => {
+                    alert('Сердечко собрано ❤️\nТы чудо!');
+                }, 200);
+            }
         }
+
+        LogSystem.info('Страница 5: Пазл (десктоп) инициализирован');
+    }
+
+    // ---------- Мобильная версия (клики, без миниатюры) ----------
+    function initPuzzleMobile() {
+        const puzzle = document.getElementById('puzzle');
+        puzzle.innerHTML = '';
+
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = 'https://images.unsplash.com/photo-1515871204537-49a5fe66a31f?q=80&w=1082&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+
+        img.onload = () => {
+            LogSystem.info('Изображение пазла загружено (мобильное)');
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 300;
+            canvas.height = 300;
+            const ctx = canvas.getContext('2d');
+
+            const imgW = img.naturalWidth;
+            const imgH = img.naturalHeight;
+            const scale = Math.max(300 / imgW, 300 / imgH);
+            const drawW = imgW * scale;
+            const drawH = imgH * scale;
+            const offsetX = (300 - drawW) / 2;
+            const offsetY = (300 - drawH) / 2;
+            ctx.drawImage(img, 0, 0, imgW, imgH, offsetX, offsetY, drawW, drawH);
+
+            let pieces = [];
+            const size = 3;
+            const pieceW = 100;
+            const pieceH = 100;
+
+            for (let r = 0; r < size; r++) {
+                for (let c = 0; c < size; c++) {
+                    const px = c * pieceW;
+                    const py = r * pieceH;
+                    const data = ctx.getImageData(px, py, pieceW, pieceH);
+
+                    const pCanvas = document.createElement('canvas');
+                    pCanvas.width = pieceW;
+                    pCanvas.height = pieceH;
+                    pCanvas.getContext('2d').putImageData(data, 0, 0);
+
+                    const url = pCanvas.toDataURL();
+                    pieces.push({
+                        id: r * size + c,
+                        url
+                    });
+                }
+            }
+
+            pieces = pieces.sort(() => Math.random() - 0.5);
+
+            let selectedPiece = null;
+
+            pieces.forEach((p, idx) => {
+                const el = document.createElement('div');
+                el.className = 'puzzle-piece';
+                el.style.backgroundImage = `url(${p.url})`;
+                el.dataset.id = p.id;
+                el.dataset.pos = idx;
+
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const currentEl = e.currentTarget;
+
+                    if (!selectedPiece) {
+                        selectedPiece = currentEl;
+                        selectedPiece.style.border = '3px solid gold';
+                        return;
+                    }
+
+                    if (selectedPiece === currentEl) {
+                        selectedPiece.style.border = '';
+                        selectedPiece = null;
+                        return;
+                    }
+
+                    const tmpBg = selectedPiece.style.backgroundImage;
+                    const tmpId = selectedPiece.dataset.id;
+
+                    selectedPiece.style.backgroundImage = currentEl.style.backgroundImage;
+                    selectedPiece.dataset.id = currentEl.dataset.id;
+
+                    currentEl.style.backgroundImage = tmpBg;
+                    currentEl.dataset.id = tmpId;
+
+                    selectedPiece.style.border = '';
+                    selectedPiece = null;
+
+                    checkPuzzleSolved();
+                });
+
+                puzzle.appendChild(el);
+            });
+        };
+
+        img.onerror = () => {
+            LogSystem.error('Ошибка загрузки изображения пазла (мобильное)');
+            for (let i = 0; i < 9; i++) {
+                const el = document.createElement('div');
+                el.className = 'puzzle-piece';
+                el.style.background = 'linear-gradient(135deg, #ff99cc, #ff66a3)';
+                el.dataset.id = i;
+                puzzle.appendChild(el);
+            }
+        };
+
+        function checkPuzzleSolved() {
+            const pieces = Array.from(puzzle.children);
+            let ok = true;
+            pieces.forEach((el, idx) => {
+                if (!el.dataset.id || Number(el.dataset.id) !== idx) {
+                    ok = false;
+                }
+            });
+
+            if (ok && !pageCompleted[4]) {
+                pageCompleted[4] = true;
+                createConfetti();
+                playSound('success');
+                LogSystem.success('Пазл собран!');
+                setTimeout(() => {
+                    alert('Сердечко собрано ❤️\nТы чудо!');
+                }, 200);
+            }
+        }
+
+        LogSystem.info('Страница 5: Пазл (мобильный) инициализирован');
+    }
+}
+
+
         //initPuzzlePage();
 
         // СТРАНИЦА 6: ГАЛЕРЕЯ - УБРАН АВТОСКРОЛЛ
