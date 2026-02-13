@@ -6,7 +6,7 @@
     <title>❤️ Тайное послание для тебя</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Marck+Script&family=Pacifico&family=Poiret+One&family=Playfair+Display:wght@400;700&family=Raleway:wght@300;400;600&family=Dancing+Script:wght@400;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Marck+Script&family=Pacifico&family=Poiret+One&family=Playfair+Display:wght@400;700&family=Raleway:wght@300;400;600&family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -125,6 +125,12 @@
             25% { transform: scale(1.1); }
             50% { transform: scale(1.05); }
             75% { transform: scale(1.15); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
         }
 
         .password-input {
@@ -1250,15 +1256,28 @@
 
         function showErrorAnimation() {
             const input = passwordInput;
+            const submit = submitBtn;
+            const heart = document.querySelector('.heart-icon');
+
+            // Красный цвет для кнопки и сердечка
+            submit.style.background = 'linear-gradient(45deg, #ff3366, #ff0000)';
+            submit.innerHTML = '✗ Неверный код';
+            heart.style.background = 'linear-gradient(45deg, #ff3366, #ff0000)';
+
+            // Тряска поля ввода
             input.style.animation = 'shake 0.5s';
             input.style.borderColor = '#ff3366';
             input.style.boxShadow = '0 0 30px rgba(255, 51, 102, 0.6)';
 
+            // Возврат к исходному состоянию через 1.5 секунды
             setTimeout(() => {
+                submit.style.background = 'linear-gradient(45deg, var(--primary), var(--secondary))';
+                submit.innerHTML = 'Открыть сердце';
+                heart.style.background = 'linear-gradient(45deg, var(--primary), var(--secondary))';
                 input.style.animation = '';
                 input.style.borderColor = 'rgba(255, 255, 255, 0.4)';
                 input.style.boxShadow = 'none';
-            }, 500);
+            }, 1500);
 
             playSound('error');
         }
@@ -1635,7 +1654,7 @@ function initShakePage() {
     // Состояние страницы (храним глобально для совместимости с другими частями)
     window._shakeState = window._shakeState || {
         actions: 0,
-        required: CONFIG.SHAKE_ACTIONS_REQUIRED || 5,
+        required: CONFIG.SHAKE_ACTIONS_REQUIRED || 10,
         lastShakeTime: 0,
         history: []
     };
@@ -1769,7 +1788,7 @@ function initShakePage() {
 
             const img = new Image();
             img.crossOrigin = 'anonymous';
-            img.src = 'https://images.unsplash.com/photo-1518568814500-bf0f8d125f46?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80';
+            img.src = 'https://images.unsplash.com/photo-1515871204537-49a5fe66a31f?q=80&w=1082&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
             img.onload = () => {
                 LogSystem.info('Изображение пазла загружено');
@@ -1883,7 +1902,7 @@ function initShakePage() {
                     playSound('success');
                     LogSystem.success('Пазл собран!');
                     setTimeout(() => {
-                        alert('Сердечко собрано ❤️');
+                        alert('Сердечко собрано ❤️\nТы чудо!');
                     }, 200);
                 }
             }
@@ -2244,6 +2263,43 @@ function initShakePage() {
                 ctx.fillStyle = `rgba(255, 92, 131, ${0.08 + Math.random() * 0.3})`;
                 drawHeart(ctx, 50 + Math.random() * (c.width - 100), 400 + Math.random() * 400, 12 + Math.random() * 24);
             }
+
+            // Рисуем большое сердце (контур)
+            ctx.save();
+            ctx.translate(c.width / 2, 500); // смещаем центр вниз
+            ctx.scale(2.5, 2.5); // увеличиваем размер
+            ctx.beginPath();
+            ctx.moveTo(0, 20);
+            ctx.bezierCurveTo(-20, -30, -50, -20, 0, 30);
+            ctx.bezierCurveTo(50, -20, 20, -30, 0, 20);
+            ctx.strokeStyle = '#ff3366';
+            ctx.lineWidth = 4;
+            ctx.shadowColor = '#ff99cc';
+            ctx.shadowBlur = 15;
+            ctx.stroke();
+            ctx.shadowBlur = 0; // сброс тени для текста
+
+            // Иероглиф "愛" внутри сердца
+            ctx.font = 'bold 100px "Noto Serif JP", "KaiTi", "楷体", "华文楷体", serif';
+            ctx.fillStyle = '#cc3366';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('愛', 0, 0);
+            ctx.restore();
+
+            // Добавим несколько крупных блёсток (звёздочек)
+            for (let i = 0; i < 10; i++) {
+                ctx.fillStyle = `rgba(255, 215, 0, ${0.3 + Math.random() * 0.5})`;
+                ctx.beginPath();
+                ctx.arc(
+                    100 + Math.random() * (c.width - 200),
+                    600 + Math.random() * 300,
+                    4 + Math.random() * 8,
+                    0, 2 * Math.PI
+                );
+                ctx.fill();
+            }
+
 
             // Создаем ссылку для скачивания
             const link = document.createElement('a');
