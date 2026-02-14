@@ -37,46 +37,7 @@
             touch-action: manipulation;
         }
 
-        /* ЛОГИ */
-        .log-panel {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            width: 300px;
-            max-height: 200px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid var(--primary);
-            border-radius: 10px;
-            padding: 10px;
-            font-size: 10px;
-            color: #00ff00;
-            font-family: monospace;
-            overflow-y: auto;
-            z-index: 9999;
-            display: none;
-        }
 
-        .log-entry {
-            margin: 2px 0;
-            padding: 2px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .log-error {
-            color: #ff3366;
-        }
-
-        .log-success {
-            color: #00ff88;
-        }
-
-        .log-warning {
-            color: #ffcc00;
-        }
-
-        .log-info {
-            color: #66ccff;
-        }
 
         /* ЭКРАН ПАРОЛЯ */
         .screen {
@@ -525,6 +486,30 @@
             color: var(--primary);
         }
 
+        .scratch-message {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            font-family: 'Dancing Script', cursive;  /* красивый рукописный шрифт */
+            font-size: clamp(24px, 6vw, 36px);       /* адаптивный размер */
+            color: #fff;
+            text-shadow: 2px 2px 8px rgba(241, 234, 234, 0.7);
+            background: linear-gradient(135deg, #f6dc76, #f6e895);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            z-index: 1;                               /* как у старого изображения */
+            box-sizing: border-box;
+            pointer-events: none;                      /* чтобы не мешать рисованию */
+            filter: drop-shadow(0 0 10px rgba(255, 92, 131, 0.8));
+        }
+
         /* СТРАНИЦА 4: ВСТРЯХНУТЬ - ИСПРАВЛЕНА */
         .shake-container {
             width: 300px;
@@ -560,6 +545,7 @@
             /* начальный формат inset — согласованный с JS */
             /*clip-path: inset(50% 50% 50% 50%);*/
             pointer-events: none; /* чтобы оверлей не блокировал кнопки (если нужно) */
+            z-index: 2;
         }
 
 
@@ -580,6 +566,43 @@
             transform: scale(1.05);
             box-shadow: 0 10px 30px rgba(255, 51, 102, 0.4);
         }
+
+
+        @keyframes romanticGlow {
+            0% { text-shadow: 0 0 10px #ffb6c1, 0 0 20px #ff69b4; }
+            50% { text-shadow: 0 0 20px #ff69b4, 0 0 30px #ffb6c1; }
+            100% { text-shadow: 0 0 10px #ffb6c1, 0 0 20px #ff69b4; }
+        }
+
+        .shake-message {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(24px, 6vw, 36px);
+            font-weight: bold;
+            color: #d43f7a;  /* насыщенный розовый */
+            background-color: #fff0f5;  /* очень бледный розовый */
+            background-image: repeating-linear-gradient(45deg, rgba(255, 182, 193, 0.1) 0px, rgba(255, 182, 193, 0.1) 10px, transparent 10px, transparent 20px);
+            text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.8);
+            box-shadow: inset 0 0 30px rgba(255, 182, 193, 0.3); /* внутреннее свечение */
+            z-index: 1;
+            transition: filter 0.3s ease;
+            filter: blur(20px);
+            animation: romanticGlow 3s infinite ease-in-out;
+        }
+
+
+
+
+
 
         /* СТРАНИЦА 5: ПАЗЛ - ИСПРАВЛЕН */
         .puzzle-area {
@@ -911,16 +934,14 @@
 </head>
 <body>
     <!-- ПАНЕЛЬ ЛОГОВ -->
-    <div class="log-panel" id="log-panel">
-        <div class="log-entry log-info">Система запущена...</div>
-    </div>
+
 
     <!-- ЭКРАН ПАРОЛЯ -->
     <div id="password-screen" class="screen">
         <div class="password-container">
             <div class="heart-icon"></div>
             <h1 style="font-family: 'Great Vibes', cursive; font-size: 36px; margin-bottom: 10px; color: var(--primary); text-shadow: 0 2px 10px rgba(255, 51, 102, 0.5);">
-                Для моей любимой ❤️
+                Для Тебя!
             </h1>
             <p style="margin-bottom: 20px; color: rgba(255, 255, 255, 0.9); font-family: 'Caveat', cursive; font-size: 22px;">
                 Открой тайное послание...
@@ -928,7 +949,7 @@
             <input type="text" id="password-input" class="password-input" placeholder="Нажми сюда и введи код...">
             <button id="submit-btn" class="submit-btn">Открыть сердце</button>
             <p style="margin-top: 20px; font-size: 16px; color: rgba(255, 255, 255, 0.6);">
-                Подсказка: то, что я говорю тебе каждое утро
+                Подсказка: плюшевая игрушка, в которой я увидел тебя (PS: белый и пушистый)
             </p>
         </div>
     </div>
@@ -954,28 +975,28 @@
             <div class="page active" id="page1">
                 <div class="page-content">
                     <h2 style="font-family: 'Marck Script', cursive; font-size: 32px; margin-bottom: 30px; color: var(--primary);">
-                        Открой меня...
+                        Переверни меня...
                     </h2>
                     <div class="card-container">
                         <div class="card" id="card">
                             <div class="card-front">
                                 <div style="font-family: 'Dancing Script', cursive; font-size: 28px; margin-bottom: 10px;">
-                                    Для тебя, моя любовь
+                                    Диана ,
                                 </div>
-                                <div style="font-family: 'Caveat', cursive; font-size: 18px; opacity: 0.9;">
+                                <!--<div style="font-family: 'Caveat', cursive; font-size: 18px; opacity: 0.9;">
                                     Нажми, чтобы открыть послание...
-                                </div>
+                                </div>-->
                                 <div class="open-instruction">Нажми на меня</div>
                             </div>
                             <div class="card-back">
                                 <div style="font-family: 'Great Vibes', cursive; font-size: 30px; color: var(--primary); margin-bottom: 15px;">
-                                    С 14 февраля!
+                                    Поздравляю тебя<br>С 14 февраля!<br>Днём всех влюблённых!
                                 </div>
                                 <div style="font-family: 'Caveat', cursive; font-size: 20px; color: #666; line-height: 1.5; margin-bottom: 15px;">
-                                    Дорогая моя, с каждым днём я люблю тебя всё сильнее...
+                                    Эта открытка — лишь маленькая часть приятностей, которые только начинаются...
                                 </div>
                                 <div style="font-family: 'Caveat', cursive; font-size: 18px; color: #999; line-height: 1.4;">
-                                    Эта открытка — лишь маленькая часть моих чувств. Каждая её страница хранит в себе частичку нашей любви.
+                                    Листай дальше =>
                                 </div>
                             </div>
                         </div>
@@ -990,10 +1011,10 @@
             <div class="page" id="page2">
                 <div class="page-content">
                     <h2 style="font-family: 'Marck Script', cursive; font-size: 32px; margin-bottom: 20px; color: var(--primary);">
-                        Открути болт
+                        Открути колёсико
                     </h2>
                     <p style="font-family: 'Caveat', cursive; font-size: 20px; margin-bottom: 20px; color: rgba(255, 255, 255, 0.9);">
-                        Покрути против часовой стрелки, чтобы снять защитный щит
+                        Покрути жёлтый кружок против часовой стрелки, чтобы снять защитный щит
                     </p>
                     <div class="shield-container">
                         <div class="shield" id="shield">
@@ -1003,12 +1024,12 @@
                             </div>
                         </div>
                         <div class="message-under-shield" id="message-under-shield">
-                            Ты смогла!<br>Моё сердце открыто для тебя ❤️
+                            Ты смогла!<br>Теперь я открыт для тебя полностью ❤️
                         </div>
                     </div>
-                    <div style="margin-top: 20px; font-family: 'Caveat', cursive; font-size: 18px; color: rgba(255, 255, 255, 0.7);">
+                    <!--<div style="margin-top: 20px; font-family: 'Caveat', cursive; font-size: 18px; color: rgba(255, 255, 255, 0.7);">
                         Крути болт пальцем против часовой стрелки
-                    </div>
+                    </div>-->
                 </div>
             </div>
 
@@ -1022,9 +1043,9 @@
                         Проведи пальцем, чтобы стереть размытие
                     </p>
                     <div class="scratch-container">
-                        <!--<img src="https://images.unsplash.com/photo-1518568814500-bf0f8d125f46?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" -->
-                            <img src="https://images.unsplash.com/photo-1518568814500-bf0f8d125f46?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
-                             class="scratch-image" id="scratch-image">
+                        <div class="scratch-message" id="scratch-message">
+                            Каким бы не казалось будущее — знай, я всегда рядом!
+                        </div>
                         <div class="scratch-overlay" id="scratch-overlay"></div>
                         <div class="scratch-text">Сотри меня...</div>
                         <canvas class="scratch-canvas" id="scratch-canvas"></canvas>
@@ -1043,10 +1064,11 @@
                         Потряси телефон или нажми кнопку
                     </p>
                     <div class="shake-container">
-                        <img src="https://images.unsplash.com/photo-1518568814500-bf0f8d125f46?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" class="shake-image" id="shake-image">
-                        <!--<img src="https://images.unsplash.com/photo-1518568814500-bf0f8d125f46?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80">-->
-                        <div class="shake-overlay" id="shake-overlay"></div>
+                    <div class="shake-message" id="shake-message">
+                        Твоя улыбка — теплее солнца в яркий день!
                     </div>
+                    <div class="shake-overlay" id="shake-overlay"></div>
+                </div>
                     <button class="shake-button" id="shake-button" >Стряхнуть размытие (0/5)</button>
                     <p style="margin-top: 20px; font-family: 'Caveat', cursive; font-size: 18px; color: rgba(255, 255, 255, 0.7);">
                         На телефоне: просто потряси устройство
@@ -1065,7 +1087,7 @@
                     </p>
                     <div class="puzzle-area" id="puzzle"></div>
                     <p style="margin-top: 20px; font-family: 'Caveat', cursive; font-size: 18px; color: var(--primary);">
-                        Нажми на кусочек и перетащи его!
+                        Нажми на кусочек или перетащи его!
                     </p>
                 </div>
             </div>
@@ -1080,17 +1102,17 @@
                         Листай фото внизу
                     </p>
                     <div class="gallery-container" id="gallery-container">
-                        <div class="gallery-slide active" style="background-image: url('https://images.unsplash.com/photo-1518568814500-bf0f8d125f46?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80');">
+                        <div class="gallery-slide active" style="background-image: url('https://plus.unsplash.com/premium_photo-1670445287762-372300cdcb77?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
                             <div style="background: rgba(0,0,0,0.6); padding: 15px; border-radius: 15px; margin-top: 250px;">
-                                <div style="font-family: 'Caveat', cursive; font-size: 22px; color: white;">Наше первое свидание ❤️</div>
+                                <div style="font-family: 'Caveat', cursive; font-size: 22px; color: white;">Наша первая встреча</div>
                             </div>
                         </div>
-                        <div class="gallery-slide" style="background-image: url('https://images.unsplash.com/photo-1518568814500-bf0f8d125f46?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80');">
+                        <div class="gallery-slide" style="background-image: url('https://images.unsplash.com/photo-1569599551613-0168197f15d3?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
                             <div style="background: rgba(0,0,0,0.6); padding: 15px; border-radius: 15px; margin-top: 250px;">
                                 <div style="font-family: 'Caveat', cursive; font-size: 22px; color: white;">Самые теплые моменты</div>
                             </div>
                         </div>
-                        <div class="gallery-slide" style="background-image: url('https://images.unsplash.com/photo-1518568814500-bf0f8d125f46?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80');">
+                        <div class="gallery-slide" style="background-image: url('https://images.unsplash.com/photo-1533601017-dc61895e03c0?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
                             <div style="background: rgba(0,0,0,0.6); padding: 15px; border-radius: 15px; margin-top: 250px;">
                                 <div style="font-family: 'Caveat', cursive; font-size: 22px; color: white;">Будущее с тобой</div>
                             </div>
@@ -1122,7 +1144,7 @@
             <div class="page" id="page8">
                 <div class="page-content">
                     <h2 style="font-family: 'Great Vibes', cursive; font-size: 42px; margin-bottom: 20px; color: var(--primary);">
-                        Для тебя, моя любовь
+                        From me, to you
                     </h2>
                     <div class="final-message">
                         <div class="final-heart">❤️</div>
@@ -1130,11 +1152,8 @@
                             С Днём Святого Валентина!
                         </div>
                         <div style="font-family: 'Caveat', cursive; font-size: 24px; line-height: 1.6; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px;">
-                            Ты — самый прекрасный подарок в моей жизни.<br>
-                            Каждый день с тобой наполнен счастьем,<br>
-                            смехом и бесконечной любовью.<br><br>
-                            Спасибо тебе за всё, что ты есть.<br>
-                            Я люблю тебя больше, чем слова могут выразить.
+                            Ты — одна из лучших неожиданных вещей в моей жизни.<br>
+                            Рядом с тобой всё как будто проще и уютнее.<br><br>Спасибо, что ты есть!
                         </div>
 
                         <button class="download-btn" id="downloadBtn" >
@@ -1157,54 +1176,11 @@
 
     <script>
         // ==================== СИСТЕМА ЛОГИРОВАНИЯ ====================
-        const LogSystem = {
-            panel: null,
-            enabled: true, // Включить/выключить логи
-            maxEntries: 50,
 
-            init() {
-                this.panel = document.getElementById('log-panel');
-                // Показать панель логов при двойном клике в правом верхнем углу
-                document.addEventListener('dblclick', (e) => {
-                    if (e.clientX > window.innerWidth - 100 && e.clientY < 100) {
-                        this.panel.style.display = this.panel.style.display === 'none' ? 'block' : 'none';
-                    }
-                });
-
-                this.log('info', 'Система логирования запущена');
-            },
-
-            log(type, message) {
-                if (!this.enabled) return;
-
-                const entry = document.createElement('div');
-                entry.className = `log-entry log-${type}`;
-                entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
-
-                this.panel.appendChild(entry);
-
-                // Ограничить количество записей
-                const entries = this.panel.querySelectorAll('.log-entry');
-                if (entries.length > this.maxEntries) {
-                    entries[0].remove();
-                }
-
-                // Прокрутить вниз
-                this.panel.scrollTop = this.panel.scrollHeight;
-
-                // Также выводим в консоль
-                console.log(`[${type.toUpperCase()}] ${message}`);
-            },
-
-            error(message) { this.log('error', message); },
-            success(message) { this.log('success', message); },
-            warning(message) { this.log('warning', message); },
-            info(message) { this.log('info', message); }
-        };
 
         // КОНФИГУРАЦИЯ
         const CONFIG = {
-            PASSWORD: '1',
+            PASSWORD: ['кролик', 'Кролик', 'заяц', 'Заяц', 'зайчик', 'Зайчик', 'кроль', 'Кроль'],
             TOTAL_PAGES: 8,
             SCRATCH_THRESHOLD: 50,
             SHAKE_ACTIONS_REQUIRED: 5,
@@ -1234,13 +1210,12 @@
 
         // ИНИЦИАЛИЗАЦИЯ
         function init() {
-            LogSystem.init();
-            LogSystem.info('Приложение запускается...');
+
 
             // Фокус на поле ввода (с задержкой для мобильных)
             setTimeout(() => {
                 passwordInput.focus();
-                LogSystem.info('Фокус установлен на поле ввода пароля');
+
             }, 500);
 
             // Обработчики пароля
@@ -1260,21 +1235,21 @@
             if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
                 DeviceMotionEvent.requestPermission().then(response => {
                     if (response === 'granted') {
-                        LogSystem.success('Разрешение на гироскоп получено');
+
                     }
                 });
             }
 
-            LogSystem.success('Инициализация завершена');
+
         }
 
         // ПАРОЛЬ
         function checkPassword() {
             const input = passwordInput.value.trim().toLowerCase();
-            LogSystem.info(`Проверка пароля: "${input}"`);
 
-            if (input === CONFIG.PASSWORD) {
-                LogSystem.success('Пароль верный!');
+
+            if (CONFIG.PASSWORD.map(p => p.toLowerCase()).includes(input)) {
+
                 showSuccessAnimation();
                 setTimeout(() => {
                     passwordScreen.style.display = 'none';
@@ -1284,7 +1259,7 @@
                     playSound('success');
                 }, 1500);
             } else {
-                LogSystem.error('Неверный пароль');
+
                 showErrorAnimation();
             }
         }
@@ -1374,7 +1349,7 @@
         function showPage(index) {
             if (index < 0 || index >= CONFIG.TOTAL_PAGES) return;
 
-            LogSystem.info(`Переход на страницу ${index + 1}`);
+
 
             // Скрываем текущую страницу
             pages[currentPage].classList.remove('active');
@@ -1438,7 +1413,7 @@
                 card.classList.add('open');
                 playSound('open');
                 pageCompleted[0] = true;
-                LogSystem.success('Открытка открыта');
+
             };
 
             card.addEventListener('click', openCard);
@@ -1456,7 +1431,7 @@
                 }
             });
 
-            LogSystem.info('Страница 1: Открытка инициализирована');
+
         }
 
         // СТРАНИЦА 2: БОЛТ
@@ -1533,7 +1508,7 @@
                     message.classList.add('show');
                     playSound('success');
                     pageCompleted[1] = true;
-                    LogSystem.success('Болт откручен');
+
 
                     setTimeout(() => {
                         shield.classList.add('fall-off');
@@ -1545,17 +1520,19 @@
             bolt.addEventListener('mousedown', startDrag);
             bolt.addEventListener('touchstart', startDrag);
 
-            LogSystem.info('Страница 2: Болт инициализирован');
+
         }
 
         // СТРАНИЦА 3: СТИРАНИЕ
         function initScratchPage() {
+            if (pageCompleted[2]) { return }
+
             const canvas = document.getElementById('scratch-canvas');
             const ctx = canvas.getContext('2d');
             const container = document.querySelector('.scratch-container');
             const overlay = document.getElementById('scratch-overlay');
             const percentText = document.getElementById('scratch-percent');
-            const image = document.getElementById('scratch-image');
+            const image = document.getElementById('scratch-message');
 
             // Устанавливаем размеры канваса
             canvas.width = container.offsetWidth;
@@ -1645,7 +1622,7 @@
 
                 playSound('success');
                 createConfetti();
-                LogSystem.success('Стирание завершено');
+
 
                 // Стираем весь холст для показа изображения
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1663,7 +1640,7 @@
             canvas.addEventListener('touchmove', draw);
             canvas.addEventListener('touchend', stopDrawing);
 
-            LogSystem.info('Страница 3: Стирание инициализировано');
+
         }
 
         // СТРАНИЦА 4: ВСТРЯХНУТЬ - ИСПРАВЛЕНО
@@ -1671,20 +1648,25 @@
 // Страница 4: Стряхни тайну – исправленная версия
 function initShakePage() {
     // Находим элементы
-    console.log('initShakePage called');
+
+    if (pageCompleted[3]) {
+
+        return; // завершаем инициализацию, обработчики не навешиваем
+    }
+
     const button = document.getElementById('shake-button');
-    const image = document.getElementById('shake-image');
+    const image = document.getElementById('shake-message');
     const overlay = document.getElementById('shake-overlay');
-    console.log('Elements:', { button, image, overlay });
+
 
     if (!button || !image || !overlay) {
-        LogSystem?.error('initShakePage: элементы не найдены');
+
         return;
     }
 
     // Если страница уже была пройдена – сразу показываем открытый результат
-    if (pageCompleted[4]) {
-        console.log('Страница 4 уже выполнена, устанавливаем финальное состояние');
+    if (pageCompleted[3]) {
+
         image.style.filter = 'blur(0)';
         overlay.style.clipPath = 'inset(0%)';
         overlay.style.opacity = '0';
@@ -1699,7 +1681,7 @@ function initShakePage() {
     // Состояние страницы (храним глобально для совместимости с другими частями)
     window._shakeState = window._shakeState || {
         actions: 0,
-        required: CONFIG.SHAKE_ACTIONS_REQUIRED || 10,
+        required: CONFIG.SHAKE_ACTIONS_REQUIRED || 5,
         lastShakeTime: 0,
         history: []
     };
@@ -1733,7 +1715,7 @@ function initShakePage() {
 
     // Функция, выполняемая при одном действии (нажатие или тряска)
     function applyAction() {
-        console.log('applyAction called, actions before:', state.actions);
+
         if (state.actions >= state.required) return;
 
         state.actions++;
@@ -1755,7 +1737,7 @@ function initShakePage() {
             button.textContent = 'Готово!';
             pageCompleted[3] = true;
             //pageCompleted[4] = true;
-            LogSystem?.success('ShakePage завершена');
+
             createConfetti(); // добавим конфетти для радости
         }
     }
@@ -1770,18 +1752,18 @@ function initShakePage() {
             try {
                 const response = await DeviceMotionEvent.requestPermission();
                 if (response !== 'granted') {
-                    LogSystem?.warn('Доступ к гироскопу не разрешён');
+
                     return;
                 }
             } catch (err) {
-                LogSystem?.error('Ошибка запроса разрешения: ' + err);
+
                 return;
             }
         }
 
         // Проверка поддержки devicemotion
         if (!window.DeviceMotionEvent) {
-            LogSystem?.warn('devicemotion не поддерживается');
+
             return;
         }
 
@@ -1820,7 +1802,7 @@ function initShakePage() {
     // Первоначальное обновление UI
     updateUI();
 
-    LogSystem?.info('Страница 4 (тряска) успешно инициализирована');
+
 }
 
 
@@ -1852,7 +1834,7 @@ function initShakePage() {
 
         const img = new Image();
         img.crossOrigin = 'anonymous';
-        img.src = 'https://images.unsplash.com/photo-1515871204537-49a5fe66a31f?q=80&w=1082&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+        img.src = 'https://images.unsplash.com/photo-1770370358383-e5a0a70b8cc7?q=80&w=688&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
         img.onload = () => {
             // Создаём холст 300x300 с изображением, сохраняя пропорции (cover)
@@ -1914,7 +1896,7 @@ function initShakePage() {
         };
 
         img.onerror = () => {
-            LogSystem.error('Ошибка загрузки изображения пазла (собранное состояние)');
+
             for (let i = 0; i < 9; i++) {
                 const el = document.createElement('div');
                 el.className = 'puzzle-piece';
@@ -1934,10 +1916,9 @@ function initShakePage() {
 
         const img = new Image();
         img.crossOrigin = 'anonymous';
-        img.src = 'https://images.unsplash.com/photo-1515871204537-49a5fe66a31f?q=80&w=1082&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+        img.src = 'https://images.unsplash.com/photo-1770370358383-e5a0a70b8cc7?q=80&w=688&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
         img.onload = () => {
-            LogSystem.info('Изображение пазла загружено (десктоп)');
 
             const canvas = document.createElement('canvas');
             canvas.width = 300;
@@ -2020,7 +2001,7 @@ function initShakePage() {
         };
 
         img.onerror = () => {
-            LogSystem.error('Ошибка загрузки изображения пазла (десктоп)');
+
             for (let i = 0; i < 9; i++) {
                 const el = document.createElement('div');
                 el.className = 'puzzle-piece';
@@ -2043,14 +2024,14 @@ function initShakePage() {
                 pageCompleted[4] = true;
                 createConfetti();
                 playSound('success');
-                LogSystem.success('Пазл собран!');
+
                 setTimeout(() => {
                     alert('Сердечко собрано ❤️\nТы чудо!');
                 }, 200);
             }
         }
 
-        LogSystem.info('Страница 5: Пазл (десктоп) инициализирован');
+
     }
 
     // ---------- Мобильная версия (клики, без миниатюры) ----------
@@ -2060,10 +2041,10 @@ function initShakePage() {
 
         const img = new Image();
         img.crossOrigin = 'anonymous';
-        img.src = 'https://images.unsplash.com/photo-1515871204537-49a5fe66a31f?q=80&w=1082&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+        img.src = 'https://images.unsplash.com/photo-1770370358383-e5a0a70b8cc7?q=80&w=688&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
         img.onload = () => {
-            LogSystem.info('Изображение пазла загружено (мобильное)');
+
 
             const canvas = document.createElement('canvas');
             canvas.width = 300;
@@ -2150,7 +2131,7 @@ function initShakePage() {
         };
 
         img.onerror = () => {
-            LogSystem.error('Ошибка загрузки изображения пазла (мобильное)');
+
             for (let i = 0; i < 9; i++) {
                 const el = document.createElement('div');
                 el.className = 'puzzle-piece';
@@ -2173,14 +2154,14 @@ function initShakePage() {
                 pageCompleted[4] = true;
                 createConfetti();
                 playSound('success');
-                LogSystem.success('Пазл собран!');
+
                 setTimeout(() => {
                     alert('Сердечко собрано ❤️\nТы чудо!');
                 }, 200);
             }
         }
 
-        LogSystem.info('Страница 5: Пазл (мобильный) инициализирован');
+
     }
 }
 
@@ -2242,7 +2223,7 @@ function initShakePage() {
                 e.stopPropagation();
             });
 
-            LogSystem.info('Страница 6: Галерея инициализирована (автоскролл отключен)');
+
         }
 
         // СТРАНИЦА 7: СЕРДЕЧНЫЙ ВЗРЫВ - ИСПРАВЛЕН
@@ -2420,7 +2401,7 @@ function initShakePage() {
                     curveOffset: 350,
                     steps: 200
                 });
-                LogSystem && LogSystem.success && LogSystem.success('Сердце взорвано!');
+
             }
 
             // -------------------- Обработчик тапа --------------------
@@ -2483,7 +2464,7 @@ function initShakePage() {
                 document.querySelectorAll('.expl-emoji').forEach(el => el.remove());
             };
 
-            LogSystem && LogSystem.info && LogSystem.info('Страница 7: Сердечный взрыв инициализирован');
+
         }
 
 // Деинициализация/вызвать при перелистывании со страницы
@@ -2505,106 +2486,276 @@ function initShakePage() {
             // Создаем конфетти
             createConfetti();
 
-            LogSystem.info('Страница 8: Финальная страница инициализирована');
+
         }
 
         // ГЕНЕРАЦИЯ И СКАЧИВАНИЕ ОТКРЫТКИ
         function generateCardImage() {
-            LogSystem.info('Начинается генерация открытки...');
+    const c = document.createElement('canvas');
+    c.width = 800;
+    c.height = 1000;
+    const ctx = c.getContext('2d');
 
-            const c = document.createElement('canvas');
-            c.width = 800;
-            c.height = 1000;
-            const ctx = c.getContext('2d');
+    // ----- Вспомогательные функции -----
+    function drawHeart(ctx, x, y, size, opts = {}) {
+        const s = size / 25;
+        ctx.save();
+        ctx.translate(x, y);
+        if (opts.fill) ctx.beginPath();
+        ctx.moveTo(0, -10 * s);
+        ctx.bezierCurveTo(12 * s, -40 * s, 60 * s, -30 * s, 0, 30 * s);
+        ctx.bezierCurveTo(-60 * s, -30 * s, -12 * s, -40 * s, 0, -10 * s);
+        if (opts.fill) ctx.fill();
+        else ctx.stroke();
+        ctx.restore();
+    }
 
-            // Градиентный фон
-            const grad = ctx.createLinearGradient(0, 0, 0, c.height);
-            grad.addColorStop(0, '#fff3f6');
-            grad.addColorStop(1, '#ffeaf0');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, c.width, c.height);
-
-            // Основной текст
-            ctx.fillStyle = '#401323';
-            ctx.font = 'bold 48px "Playfair Display", serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('С Днём Святого Валентина', c.width / 2, 160);
-
-            // Дополнительный текст
-            ctx.font = '28px "Inter", sans-serif';
-            wrapText(ctx, 'Я люблю тебя до Луны и обратно. Спасибо, что ты есть в моей жизни.', c.width / 2, 240, 660, 34);
-
-            // Рисуем сердечки
-            for (let i = 0; i < 20; i++) {
-                ctx.fillStyle = `rgba(255, 92, 131, ${0.08 + Math.random() * 0.3})`;
-                drawHeart(ctx, 50 + Math.random() * (c.width - 100), 400 + Math.random() * 400, 12 + Math.random() * 24);
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight, align = 'center') {
+        const paragraphs = text.split('\n');
+        let currentY = y;
+        ctx.textAlign = align;
+        for (let rawParagraph of paragraphs) {
+            let paragraph = rawParagraph.trim();
+            if (paragraph === '') {
+                currentY += lineHeight; // пустая строка
+                continue;
             }
-
-            // Рисуем большое сердце (контур)
-            ctx.save();
-            ctx.translate(c.width / 2, 500); // смещаем центр вниз
-            ctx.scale(2.5, 2.5); // увеличиваем размер
-            ctx.beginPath();
-            ctx.moveTo(0, 20);
-            ctx.bezierCurveTo(-20, -30, -50, -20, 0, 30);
-            ctx.bezierCurveTo(50, -20, 20, -30, 0, 20);
-            ctx.strokeStyle = '#ff3366';
-            ctx.lineWidth = 4;
-            ctx.shadowColor = '#ff99cc';
-            ctx.shadowBlur = 15;
-            ctx.stroke();
-            ctx.shadowBlur = 0; // сброс тени для текста
-
-            // Иероглиф "愛" внутри сердца
-            ctx.font = 'bold 100px "Noto Serif JP", "KaiTi", "楷体", "华文楷体", serif';
-            ctx.fillStyle = '#cc3366';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('愛', 0, 0);
-            ctx.restore();
-
-            // Добавим несколько крупных блёсток (звёздочек)
-            for (let i = 0; i < 10; i++) {
-                ctx.fillStyle = `rgba(255, 215, 0, ${0.3 + Math.random() * 0.5})`;
-                ctx.beginPath();
-                ctx.arc(
-                    100 + Math.random() * (c.width - 200),
-                    600 + Math.random() * 300,
-                    4 + Math.random() * 8,
-                    0, 2 * Math.PI
-                );
-                ctx.fill();
+            const words = paragraph.split(' ').filter(w => w.length > 0);
+            if (words.length === 0) {
+                currentY += lineHeight;
+                continue;
             }
-
-
-            // Создаем ссылку для скачивания
-            const link = document.createElement('a');
-            link.download = 'valentine-card.png';
-            link.href = c.toDataURL('image/png');
-            link.click();
-
-            LogSystem.success('Открытка сгенерирована и скачана');
-        }
-
-        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-            const words = text.split(' ');
             let line = '';
-
+            const lines = [];
             for (let n = 0; n < words.length; n++) {
                 const testLine = line + words[n] + ' ';
                 const metrics = ctx.measureText(testLine);
-                const testWidth = metrics.width;
-
-                if (testWidth > maxWidth && n > 0) {
-                    ctx.fillText(line, x, y);
+                if (metrics.width > maxWidth && n > 0) {
+                    lines.push(line.trim());
                     line = words[n] + ' ';
-                    y += lineHeight;
                 } else {
                     line = testLine;
                 }
             }
-            ctx.fillText(line, x, y);
+            if (line) lines.push(line.trim());
+            for (let i = 0; i < lines.length; i++) {
+                ctx.fillText(lines[i], x, currentY + i * lineHeight);
+            }
+            currentY += lines.length * lineHeight;
         }
+    }
+
+    function drawPetalCluster(x, y, scale = 1, opacity = 0.34) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.globalAlpha = opacity;
+        const petals = 5;
+        for (let i = 0; i < petals; i++) {
+            ctx.save();
+            const angle = (i / petals) * Math.PI * 2;
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.ellipse(8 * scale, 0, 9 * scale, 4.2 * scale, 0.6, 0, Math.PI * 2);
+            ctx.fillStyle = '#e8b2c1';
+            ctx.fill();
+            ctx.restore();
+        }
+        ctx.restore();
+    }
+
+    // ----- 1. Нежный градиент фона -----
+    const grad = ctx.createLinearGradient(0, 0, 0, c.height);
+    grad.addColorStop(0, '#fffafc');
+    grad.addColorStop(0.66, '#fff2f7');
+    grad.addColorStop(1, '#ffeef6');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, c.width, c.height);
+
+    // ----- 2. Очень лёгкая текстура бумаги (очень немного точек) -----
+    ctx.save();
+    ctx.globalAlpha = 0.035;
+    ctx.fillStyle = '#d8b7c3';
+    for (let i = 0; i < 28; i++) { // мало точек ради скорости
+        const x = Math.random() * c.width;
+        const y = Math.random() * c.height;
+        const r = 0.9 + Math.random() * 1.0;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    ctx.restore();
+
+    // ----- 3. Тонкая рамка -----
+    ctx.save();
+    ctx.strokeStyle = '#e9b7c2';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(34, 34, c.width - 68, c.height - 68);
+    ctx.restore();
+
+    // ----- 4. Угловые сердца -----
+    ctx.save();
+    ctx.fillStyle = '#f06d8b';
+    ctx.globalAlpha = 0.62;
+    const corners = [
+        [54, 54], [c.width - 54, 54],
+        [54, c.height - 54], [c.width - 54, c.height - 54]
+    ];
+    corners.forEach(([x, y]) => drawHeart(ctx, x, y, 20, { fill: true }));
+    ctx.globalAlpha = 1;
+    ctx.restore();
+
+    // ----- 5. Лепестковые группы (аккуратно, вместо "волосков") -----
+    drawPetalCluster(120, 210, 1.05, 0.34);
+    drawPetalCluster(c.width - 140, 310, 1.1, 0.34);
+    drawPetalCluster(140, c.height - 230, 1.0, 0.34);
+    drawPetalCluster(250, 420, 0.7, 0.28);
+    drawPetalCluster(c.width - 260, 480, 0.7, 0.28);
+
+    // ----- 6. Заголовок — меньше, сдержанно -----
+
+
+    // ----- 7. Акцентная строка — очень большая (вы просили) -----
+    ctx.font = 'bold 38px "Dancing Script", cursive'; // крупная акцентная строка
+    ctx.fillStyle = '#5b2430';
+    ctx.textAlign = 'center';
+    ctx.fillText('Самому дорогому и пушистому кролику!', c.width / 2, 188);
+
+    // ----- 8. Основное послание — текст увеличен, более «перечитываемый» -----
+    ctx.font = '26px "Caveat", cursive'; // увеличенный основной текст
+    ctx.fillStyle = '#56343a';
+    const message = 'От сердца и почек — дарю тебе цветочек!\n ' +
+                    'Да ни один, а целых 101 розу!\n ' +
+                    'Просто потому что 101 в двоичном коде — это 5,\n ' +
+                    'а 5 — это мой максимальный балл за день, когда ты рядом.\n\n' +
+                    'С 14 февраля, мой самый любимый терапевт сердца ❤️';
+    wrapText(ctx, message, c.width / 2, 240, 680, 36);
+
+    // ----- 9. Большое сердце — простой и выразительный знак -----
+    ctx.save();
+    ctx.translate(c.width / 2, 560);
+    ctx.scale(2.05, 2.05);
+    ctx.beginPath();
+    ctx.moveTo(0, 18);
+    ctx.bezierCurveTo(-18, -24, -45, -16, 0, 26);
+    ctx.bezierCurveTo(45, -16, 18, -24, 0, 18);
+    ctx.strokeStyle = '#ff6f98';
+    ctx.lineWidth = 2.6;
+    ctx.stroke();
+
+    // Внутренний символ — маленькое сердце
+    ctx.fillStyle = '#d63b5c';
+    ctx.font = 'bold 92px "Noto Serif JP", "KaiTi", serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('❤', 0, 2);
+    ctx.restore();
+
+    // ----- 10. Мини-акценты блёстков — экономно -----
+    ctx.save();
+    for (let i = 0; i < 3; i++) {
+        const x = 180 + Math.random() * (c.width - 360);
+        const y = 460 + Math.random() * 320;
+        ctx.globalAlpha = 0.24 + Math.random() * 0.28;
+        ctx.beginPath();
+        ctx.arc(x, y, 2 + Math.random() * 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,210,140,0.95)';
+        ctx.fill();
+    }
+    ctx.restore();
+
+    // ----- 11. Ленточка-штамп (верхняя правая) — оставил, но аккуратно -----
+
+
+    // ----- 12. Печать внизу — крупная, читаемая и заметная -----
+    ctx.save();
+    const stampX = c.width / 2;
+    const stampY = c.height - 110;
+    const stampR = 82; // крупный радиус штампа
+    // фон круга
+    ctx.beginPath();
+    ctx.arc(stampX, stampY, stampR, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(220,150,165,0.08)';
+    ctx.fill();
+    // внешняя двойная рамка
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#d05d6f';
+    ctx.setLineDash([6, 6]);
+    ctx.beginPath();
+    ctx.arc(stampX, stampY, stampR, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.lineWidth = 1.2;
+    ctx.strokeStyle = '#e8a1ad';
+    ctx.beginPath();
+    ctx.arc(stampX, stampY, stampR - 8, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Большой день — очень крупный и контрастный
+    ctx.fillStyle = '#7a2a35';
+    ctx.font = '700 54px "Inter", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('14', stampX, stampY - 12);
+
+    // Меньше — месяц и год под числом
+    ctx.font = '600 16px "Inter", sans-serif';
+    ctx.fillText('02 · 2026', stampX, stampY + 36);
+
+    // Маленькая надпись внизу штампа
+    ctx.font = 'bold 12px "Inter", sans-serif';
+    //ctx.fillText('с любовью', stampX, stampY + 60);
+    ctx.restore();
+
+    // ----- 13. Подпись (снизу, чуть выше печати) -----
+    ctx.save();
+    ctx.font = '25px "Dancing Script", cursive';
+    ctx.fillStyle = '#6d2a33';
+    ctx.textAlign = 'center';
+    // подпись разместил по центру чуть выше печати
+    ctx.fillText('Бодя 🙃', c.width / 2, c.height - 170);
+    ctx.restore();
+
+    // ----- Скачивание -----
+    const link = document.createElement('a');
+    link.download = 'valentine-card.png';
+    link.href = c.toDataURL('image/png');
+    link.click();
+}
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight, align = 'center') {
+    const paragraphs = text.split('\n');
+    let currentY = y;
+    ctx.textAlign = align;
+    for (let rawParagraph of paragraphs) {
+        let paragraph = rawParagraph.trim();
+        if (paragraph === '') {
+            currentY += lineHeight; // пустая строка
+            continue;
+        }
+        const words = paragraph.split(' ').filter(w => w.length > 0);
+        if (words.length === 0) {
+            currentY += lineHeight;
+            continue;
+        }
+        let line = '';
+        const lines = [];
+        for (let n = 0; n < words.length; n++) {
+            const testLine = line + words[n] + ' ';
+            const metrics = ctx.measureText(testLine);
+            if (metrics.width > maxWidth && n > 0) {
+                lines.push(line.trim());
+                line = words[n] + ' ';
+            } else {
+                line = testLine;
+            }
+        }
+        if (line) lines.push(line.trim());
+        for (let i = 0; i < lines.length; i++) {
+            ctx.fillText(lines[i], x, currentY + i * lineHeight);
+        }
+        currentY += lines.length * lineHeight;
+    }
+}
 
         function drawHeart(ctx, x, y, size) {
             ctx.beginPath();
@@ -2727,7 +2878,7 @@ function initShakePage() {
                     oscillator.stop(audioContext.currentTime + 0.1);
                 }
             } catch (e) {
-                LogSystem.warning('Аудио не поддерживается: ' + e.message);
+
             }
         }
 
